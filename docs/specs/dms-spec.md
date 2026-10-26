@@ -183,7 +183,7 @@ Manter React com componentes funcionais e Hooks, organizado em `components/`, `p
 
 ## 8. Plano de execução
 
-Este plano descreve etapas futuras. Nesta entrega, somente este documento de especificação deve ser criado; não implementar nem editar arquivos de backend ou frontend.
+Esta entrega implementa as etapas abaixo, incluindo os arquivos de backend e frontend descritos neste pull request.
 
 1. Confirmar os contratos, a política de identidade do MVP e os defaults de configuração; preparar testes de comportamento para upload, listagem, download e erros.
 2. Implementar a camada de repositórios para armazenamento local via Multer `diskStorage` e metadados em memória, incluindo geração de nomes físicos e compensação de falhas.

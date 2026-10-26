@@ -25,7 +25,10 @@ export default function UploadComponent({ userId, onUploaded }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input type="file" onChange={(event) => setFile(event.target.files[0] ?? null)} />
+      <label>
+        Arquivo do documento:{' '}
+        <input type="file" onChange={(event) => setFile(event.target.files[0] ?? null)} />
+      </label>
       <button type="submit" disabled={!file || loading}>
         {loading ? 'Enviando...' : 'Enviar'}
       </button>
