@@ -159,6 +159,42 @@ test('API de documentos com armazenamento local', async (t) => {
     assert.strictEqual(result.document.size, 64);
   });
 
+  await t.test('preserva arquivos binários com o mesmo nome no upload, listagem e download', async () => {
+    const owner = 'binary-owner';
+    const contents = [
+      Buffer.from([0x00, 0xff, 0x80, 0x0d, 0x0a]),
+      Buffer.from([0xfe, 0x00, 0x01]),
+    ];
+    const documents = [];
+
+    for (const content of contents) {
+      const form = new FormData();
+      form.append('file', new Blob([content], { type: 'application/octet-stream' }), 'dados.bin');
+      const response = await request('/upload', { method: 'POST', body: form }, owner);
+      assert.strictEqual(response.status, 201);
+      const { document: uploaded } = await response.json();
+      assert.strictEqual(uploaded.originalName, 'dados.bin');
+      assert.strictEqual(uploaded.size, content.length);
+      assert.strictEqual(uploaded.owner, owner);
+      assert.strictEqual(uploaded.contentType, 'application/octet-stream');
+      documents.push(uploaded);
+    }
+
+    assert.notStrictEqual(documents[0].id, documents[1].id);
+    const response = await request('/documents', {}, owner);
+    assert.strictEqual(response.status, 200);
+    assert.deepStrictEqual(await response.json(), { documents });
+
+    for (const [index, uploaded] of documents.entries()) {
+      const download = await request(`/documents/${uploaded.id}/download`, {}, owner);
+      assert.strictEqual(download.status, 200);
+      assert.match(download.headers.get('content-disposition'), /attachment; filename="dados.bin"/);
+      assert.strictEqual(download.headers.get('content-type'), 'application/octet-stream');
+      assert.strictEqual(download.headers.get('content-length'), String(contents[index].length));
+      assert.deepStrictEqual(Buffer.from(await download.arrayBuffer()), contents[index]);
+    }
+  });
+
   await t.test('valida identificador e trata documento inexistente', async () => {
     await expectError(await request('/documents/invalido/download'), 400, 'INVALID_DOCUMENT_ID');
     await expectError(await request(`/documents/${randomUUID()}/download`),

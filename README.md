@@ -54,4 +54,25 @@ proprietário ou ausentes retornam `404`. Erros seguem o formato
 autenticação. Não exponha este MVP a usuários não confiáveis.
 Consulte os contratos completos na [especificação](docs/specs/dms-spec.md).
 
+## Integração contínua
+
+O [workflow de CI](.github/workflows/ci.yml) executa em todo `push` e
+`pull_request`, usando Node.js 24. Ele instala as dependências do backend e do
+frontend com `npm install`, compila o frontend com `npm run build` e executa
+os testes do backend com `npm test`.
+
+Para validar localmente com a mesma versão do Node.js:
+
+```sh
+npm --prefix backend install
+npm --prefix frontend install
+npm --prefix frontend run build
+npm --prefix backend test
+```
+
+Os testes de integração exercitam upload, listagem por proprietário e download
+via HTTP, com armazenamento temporário isolado. Também cobrem entradas inválidas,
+limite de tamanho, falhas de armazenamento e a preservação de bytes de arquivos
+binários com o mesmo nome.
+
 &copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
